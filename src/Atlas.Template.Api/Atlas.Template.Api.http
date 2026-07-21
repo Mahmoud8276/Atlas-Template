@@ -1,0 +1,6 @@
+@Atlas.Template.Api_HostAddress = http://localhost:5117
+
+GET {{Atlas.Template.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
