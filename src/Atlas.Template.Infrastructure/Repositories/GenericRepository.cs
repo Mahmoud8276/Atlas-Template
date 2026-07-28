@@ -1,15 +1,19 @@
-﻿using Atlas.Template.Core.Interfaces.IRepositories;
+﻿using Atlas.Template.Core.Interfaces;
+using Atlas.Template.Core.Interfaces.IRepositories;
 using Atlas.Template.Core.Models;
 using Atlas.Template.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Atlas.Template.Infrastructure.Repositories
 {
     public class GenericRepository<TModel, TKey> : IGenericRepository<TModel, TKey> where TModel : BaseModel<TKey>
     {
-        private readonly AppDbContext _context;
+        protected readonly AppDbContext _context;
         public GenericRepository(AppDbContext context)
         {
             _context = context;
@@ -19,6 +23,17 @@ namespace Atlas.Template.Infrastructure.Repositories
         {
             return await _context.Set<TModel>().ToListAsync();
         }
+
+        public async Task<IReadOnlyList<TModel>> GetAllWithSpecAsync(ISpecification<TModel, TKey> spec)
+        {
+            return await SpecificationEvaluator<TModel, TKey>.GetQuery(_context.Set<TModel>().AsQueryable(), spec).ToListAsync();
+        }
+
+        public async Task<TModel?> GetWithSpecAsync(ISpecification<TModel, TKey> spec)
+        {
+            return await SpecificationEvaluator<TModel, TKey>.GetQuery(_context.Set<TModel>().AsQueryable(), spec).FirstOrDefaultAsync();
+        }
+
 
         public async Task<TModel?> GetByIdAsync(TKey id)
         {
@@ -47,10 +62,14 @@ namespace Atlas.Template.Infrastructure.Repositories
             _context.Set<TModel>().RemoveRange(models);
         }
 
-
         public void UpdateAsync(TModel model)
         {
             _context.Set<TModel>().Update(model);
+        }
+
+        public async Task<IReadOnlyList<TModel>> FindAsync(Expression<Func<TModel, bool>> condition)
+        {
+            return await _context.Set<TModel>().Where(condition).ToListAsync();
         }
     }
 }
