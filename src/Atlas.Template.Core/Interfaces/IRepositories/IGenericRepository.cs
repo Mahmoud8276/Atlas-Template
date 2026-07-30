@@ -17,6 +17,7 @@ namespace Atlas.Template.Core.Interfaces.IRepositories
         public void DeleteAsync(TModel model);
         public void DeleteRangeAsync(IEnumerable<TModel> models);
         public Task<IReadOnlyList<TModel>> GetAllWithSpecAsync(ISpecification<TModel, TKey> spec);
+        public Task<int> GetCountWithSpecAsync(ISpecification<TModel, TKey> spec);
         public Task<TModel?> GetWithSpecAsync(ISpecification<TModel, TKey> spec);
     }
 }

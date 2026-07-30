@@ -7,7 +7,7 @@ namespace Atlas.Template.Core.Interfaces
     public interface IUnitOfWork : IAsyncDisposable
     {
         // Ex:
-        //public IProductRepositoty ProductRepositoty { get; }
+        // public IProductRepositoty ProductRepositoty { get; }
 
         public Task CompleteAsync();
         public Task<IDbContextTransaction> BeginTransactionAsync();
