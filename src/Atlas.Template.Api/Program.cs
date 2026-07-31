@@ -5,6 +5,8 @@ using Atlas.Template.Services.ApplicatoinServicesConfig;
 using Atlas.Template.Api.StartupExtensions;
 using Asp.Versioning;
 using Microsoft.OpenApi.Models;
+using System;
+using Atlas.Template.Api.ExceptionHandlers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +19,18 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo() { Title = "Atlas Template", Version = "1.0" });
     options.SwaggerDoc("v2", new OpenApiInfo() { Title = "Atlas Template", Version = "2.0" });
 });
+
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = ctx =>
+    {
+        ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
+        ctx.ProblemDetails.Extensions["timestamp"] = DateTime.UtcNow;
+        ctx.ProblemDetails.Extensions["instance"] = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
+    };
+});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddIdentityConfigurations();
@@ -55,6 +69,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 
 app.Run();

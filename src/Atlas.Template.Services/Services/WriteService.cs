@@ -5,6 +5,8 @@ using Atlas.Template.Core.Models;
 using Atlas.Template.Services.IServices;
 using Atlas.Template.Services.ServiceResponses;
 using FluentValidation;
+using Mapster;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Atlas.Template.Services.Services
@@ -50,7 +52,10 @@ namespace Atlas.Template.Services.Services
 
             var entity = dto.Adapt<TModel>();
 
-            await BeforeCreateAsync(entity, dto);
+            var result = await BeforeCreateAsync(entity, dto);
+            if (!result.IsSuccess)
+                return result;
+
 
             await _repository.AddAsync(entity);
             await _unitOfWork.CompleteAsync();
@@ -78,7 +83,9 @@ namespace Atlas.Template.Services.Services
                 }
             }
 
-            await BeforeUpdateAsync(entity, dto);
+            var result = await BeforeUpdateAsync(entity, dto);
+            if (!result.IsSuccess)
+                return result;
 
             dto.Adapt(entity);
 
@@ -96,7 +103,9 @@ namespace Atlas.Template.Services.Services
             if (entity is null)
                 return Response.Fail(message: "Resource not found.", statusCode: HttpStatusCode.NotFound);
 
-            await BeforeDeleteAsync(entity);
+            var result = await BeforeDeleteAsync(entity);
+            if(!result.IsSuccess)
+                return result;
 
             _repository.DeleteAsync(entity);
             await _unitOfWork.CompleteAsync();
@@ -108,11 +117,11 @@ namespace Atlas.Template.Services.Services
 
 
 
-        protected virtual Task BeforeCreateAsync(TModel entity, TCreateDto dto) => Task.CompletedTask;
+        protected virtual async Task<Response> BeforeCreateAsync(TModel entity, TCreateDto dto) => Response.Success();
         protected virtual Task AfterCreateAsync(TModel entity, TCreateDto dto) => Task.CompletedTask;
-        protected virtual Task BeforeUpdateAsync(TModel entity, TUpdateDto dto) => Task.CompletedTask;
-        protected virtual Task AfterUpdateAsync(TModel entity, TUpdateDto dto) => Task.CompletedTask;
-        protected virtual Task BeforeDeleteAsync(TModel entity) => Task.CompletedTask;
+        protected virtual async Task<Response> BeforeUpdateAsync(TModel entity, TUpdateDto dto) => Response.Success();
+        protected virtual  Task AfterUpdateAsync(TModel entity, TUpdateDto dto) => Task.CompletedTask;
+        protected virtual async Task<Response> BeforeDeleteAsync(TModel entity) => Response.Success();
         protected virtual Task AfterDeleteAsync(TModel entity) => Task.CompletedTask;
     }
 }

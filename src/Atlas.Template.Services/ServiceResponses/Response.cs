@@ -29,7 +29,7 @@ namespace Atlas.Template.Services.ServiceResponses
         }
 
         public static Response Success(
-            object data,
+            object data = null,
             string message = "Success!",
             HttpStatusCode statusCode = HttpStatusCode.OK)
         {
