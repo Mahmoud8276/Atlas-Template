@@ -1,23 +1,32 @@
 ﻿using System.Net;
+using System.Text.Json.Serialization;
 
-namespace Atlas.Template.Services.ServiceResponses
+namespace Atlas.Template.Services.Responses
 {
     public class BaseResponse
     {
+        [JsonPropertyOrder(1)]
         public bool IsSuccess { get; set; }
+        
+        [JsonPropertyOrder(2)]
         public string Message { get; set; }
+        
+        [JsonPropertyOrder(4)]
         public string Details { get; set; }
-        public HttpStatusCode StatusCode { get; set; }
+        
+        [JsonPropertyOrder(3)]
+        public int StatusCode { get; set; }
     }
 
     public class Response : BaseResponse
     {
+        [JsonPropertyOrder(5)]
         public object Data { get; set; }
 
         public static Response Fail(
-            string message = "Fail!", 
-            string details = null, 
-            HttpStatusCode statusCode = HttpStatusCode.BadRequest)
+            string message = "Fail!",
+            int statusCode = (int)HttpStatusCode.BadRequest,
+            string details = null)
         {
             return new Response()
             {
@@ -31,7 +40,7 @@ namespace Atlas.Template.Services.ServiceResponses
         public static Response Success(
             object data = null,
             string message = "Success!",
-            HttpStatusCode statusCode = HttpStatusCode.OK)
+            int statusCode = (int)HttpStatusCode.OK)
         {
             return new Response()
             {
@@ -45,12 +54,13 @@ namespace Atlas.Template.Services.ServiceResponses
 
     public class Response<T> : BaseResponse
     {
+        [JsonPropertyOrder(5)]
         public T Data { get; set; }
 
         public static Response<T> Fail(
             string message = "Fail!",
-            string details = null,
-            HttpStatusCode statusCode = HttpStatusCode.BadRequest)
+            int statusCode = (int)HttpStatusCode.BadRequest,
+            string details = null)
         {
             return new Response<T>()
             {
@@ -64,7 +74,7 @@ namespace Atlas.Template.Services.ServiceResponses
         public static Response<T> Success(
             T data,
             string message = "Success!",
-            HttpStatusCode statusCode = HttpStatusCode.OK)
+            int statusCode = (int)HttpStatusCode.OK)
         {
             return new Response<T>()
             {

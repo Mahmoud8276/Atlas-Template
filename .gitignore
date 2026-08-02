@@ -486,3 +486,6 @@ $RECYCLE.BIN/
 **/appsettings.Development.json
 **/appsettings.Staging.json
 **/appsettings.Production.json
+
+src/Atlas.Template.Api/wwwroot/files/UserImages/*
+src/Atlas.Template.Infrastructure/Migrations/*

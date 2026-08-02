@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Atlas.Template.Services.IServices;
+using Atlas.Template.Services.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Atlas.Template.Services.ApplicatoinServicesConfig
 {
@@ -9,6 +11,9 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
 
             // Ex:
             // services.AddScoped<IProductService, ProductService>();
+             services.AddScoped<ITokenService, TokenService>();
+             services.AddScoped<IAccountService, AccountService>();
+             services.AddScoped<IEmailService, EmailService>();
 
             return services;
         }

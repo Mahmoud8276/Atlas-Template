@@ -1,6 +1,6 @@
 ﻿using Atlas.Template.Core.Interfaces.ISpecificationParams;
 using Atlas.Template.Core.Models;
-using Atlas.Template.Services.ServiceResponses;
+using Atlas.Template.Services.Responses;
 using System.Threading.Tasks;
 
 namespace Atlas.Template.Services.IServices

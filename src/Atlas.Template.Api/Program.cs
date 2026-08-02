@@ -7,11 +7,18 @@ using Asp.Versioning;
 using Microsoft.OpenApi.Models;
 using System;
 using Atlas.Template.Api.ExceptionHandlers;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+});
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -20,6 +27,7 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v2", new OpenApiInfo() { Title = "Atlas Template", Version = "2.0" });
 });
 
+// TODO: Check its presestence
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = ctx =>
@@ -35,6 +43,9 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddIdentityConfigurations();
 builder.Services.AddDataSeeders();
+builder.Services.AddApplicationServices();
+builder.Services.AddMappingProfiles(builder.Configuration);
+builder.Services.AddOptionsConfigurations(builder.Configuration);
 
 builder.Services.AddApiVersioning(options =>
 {
@@ -56,6 +67,10 @@ builder.Services.AddApiVersioning()
 var app = builder.Build();
 await app.ExecuteStartupExtensions();
 
+app.UseExceptionHandler();
+
+app.UseHsts();
+app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {
@@ -67,9 +82,14 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v2/swagger.json", "Atlas Template v2");
     });
 }
+app.UseRouting();
+app.UseCors();
 
-app.UseHttpsRedirection();
-app.UseExceptionHandler();
+app.UseAuthentication();
+app.UseAuthorization();
 
+app.UseStaticFiles();
+
+app.MapControllers();
 
 app.Run();

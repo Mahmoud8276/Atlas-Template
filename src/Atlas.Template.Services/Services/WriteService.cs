@@ -3,7 +3,7 @@ using Atlas.Template.Core.Interfaces.IRepositories;
 using Atlas.Template.Core.Interfaces.ISpecificationParams;
 using Atlas.Template.Core.Models;
 using Atlas.Template.Services.IServices;
-using Atlas.Template.Services.ServiceResponses;
+using Atlas.Template.Services.Responses;
 using FluentValidation;
 using Mapster;
 using System.Net;
@@ -46,7 +46,7 @@ namespace Atlas.Template.Services.Services
                     return Response.Fail(
                         message: "Validation failed.",
                         details: string.Join("; ", validationResult.Errors),
-                        statusCode: HttpStatusCode.BadRequest);
+                        statusCode: (int)HttpStatusCode.BadRequest);
                 }
             }
 
@@ -62,14 +62,14 @@ namespace Atlas.Template.Services.Services
 
             await AfterCreateAsync(entity, dto);
 
-            return Response.Success(data: entity.Adapt<TDetailsDto>(), statusCode: HttpStatusCode.Created);
+            return Response.Success(data: entity.Adapt<TDetailsDto>(), statusCode: (int)HttpStatusCode.Created);
         }
 
         public async Task<Response> UpdateAsync(TUpdateDto dto, TKey id)
         {
             var entity = await _repository.GetByIdAsync(id);
             if (entity is null)
-                return Response.Fail(message: "Resource not found.", statusCode: HttpStatusCode.NotFound);
+                return Response.Fail(message: "Resource not found.", statusCode: (int)HttpStatusCode.NotFound);
 
             if (_updateValidator is not null)
             {
@@ -79,7 +79,7 @@ namespace Atlas.Template.Services.Services
                     return Response.Fail(
                         message: "Validation failed.",
                         details: string.Join("; ", validationResult.Errors),
-                        statusCode: HttpStatusCode.BadRequest);
+                        statusCode: (int)HttpStatusCode.BadRequest);
                 }
             }
 
@@ -94,14 +94,14 @@ namespace Atlas.Template.Services.Services
 
             await AfterUpdateAsync(entity, dto);
 
-            return Response.Success(data: entity.Adapt<TDetailsDto>(), statusCode: HttpStatusCode.OK);
+            return Response.Success(data: entity.Adapt<TDetailsDto>(), statusCode: (int)HttpStatusCode.OK);
         }
 
         public async Task<Response> DeleteAsync(TKey id)
         {
             var entity = await _repository.GetByIdAsync(id);
             if (entity is null)
-                return Response.Fail(message: "Resource not found.", statusCode: HttpStatusCode.NotFound);
+                return Response.Fail(message: "Resource not found.", statusCode: (int)HttpStatusCode.NotFound);
 
             var result = await BeforeDeleteAsync(entity);
             if(!result.IsSuccess)
@@ -112,7 +112,7 @@ namespace Atlas.Template.Services.Services
 
             await AfterDeleteAsync(entity);
 
-            return Response.Success(data: null, message: "Deleted successfully.", statusCode: HttpStatusCode.OK);
+            return Response.Success(data: null, message: "Deleted successfully.", statusCode: (int)HttpStatusCode.OK);
         }
 
 

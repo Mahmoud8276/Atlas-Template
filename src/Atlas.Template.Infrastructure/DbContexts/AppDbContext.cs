@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Atlas.Template.Infrastructure.DbContexts
 {
-    public class AppDbContext : IdentityDbContext<AppUser,UserRole, string>
+    public class AppDbContext : IdentityDbContext<AppUser, UserRole, string>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

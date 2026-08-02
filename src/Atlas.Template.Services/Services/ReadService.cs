@@ -4,7 +4,7 @@ using Atlas.Template.Core.Interfaces.IRepositories;
 using Atlas.Template.Core.Interfaces.ISpecificationParams;
 using Atlas.Template.Core.Models;
 using Atlas.Template.Services.IServices;
-using Atlas.Template.Services.ServiceResponses;
+using Atlas.Template.Services.Responses;
 using Mapster;
 using System.Collections.Generic;
 using System.Net;
@@ -46,10 +46,10 @@ namespace Atlas.Template.Services.Services
             var resource = await _repository.GetByIdAsync(id);
             if(resource == null)
             {
-                return Response.Fail(message: "resource not found", statusCode: HttpStatusCode.NotFound);
+                return Response.Fail(message: "resource not found", statusCode: (int)HttpStatusCode.NotFound);
             }
 
-            return Response.Success(data: resource.Adapt<TDetailsDto>(), statusCode:HttpStatusCode.OK);
+            return Response.Success(data: resource.Adapt<TDetailsDto>(), statusCode: (int)HttpStatusCode.OK);
         }
     }
 }
