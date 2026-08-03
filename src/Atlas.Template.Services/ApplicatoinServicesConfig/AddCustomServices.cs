@@ -14,6 +14,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
              services.AddScoped<ITokenService, TokenService>();
              services.AddScoped<IAccountService, AccountService>();
              services.AddScoped<IEmailService, EmailService>();
+             services.AddScoped<IUserService, UserService>();
 
             return services;
         }

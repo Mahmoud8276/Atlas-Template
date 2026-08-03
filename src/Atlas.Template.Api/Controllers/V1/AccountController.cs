@@ -41,9 +41,5 @@ namespace Atlas.Template.Api.Controllers.V1
             return StatusCode((int)result.StatusCode, result);
         }
 
-
-        // GET api/account/users
-
-        // GET api/account/users/{user_id}
     }
 }

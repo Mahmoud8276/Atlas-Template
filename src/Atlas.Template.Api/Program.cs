@@ -67,7 +67,6 @@ builder.Services.AddApiVersioning()
 var app = builder.Build();
 await app.ExecuteStartupExtensions();
 
-app.UseExceptionHandler();
 
 app.UseHsts();
 app.UseHttpsRedirection();
@@ -82,6 +81,9 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v2/swagger.json", "Atlas Template v2");
     });
 }
+
+app.UseExceptionHandler();
+
 app.UseRouting();
 app.UseCors();
 
