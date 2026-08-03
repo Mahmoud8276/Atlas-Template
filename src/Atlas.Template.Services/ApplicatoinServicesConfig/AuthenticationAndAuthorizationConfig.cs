@@ -28,7 +28,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
                 };
 
-                options.Events.OnChallenge
+                options.Events = JwtBearerEventsConfig.Build();
             });
 
             services.AddAuthorization(options =>
