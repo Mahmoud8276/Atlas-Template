@@ -160,13 +160,13 @@ namespace Atlas.Template.Services.Services
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if(user == null)
             {
-                // We returned success here for not leaking the registered emails for unauthorized users.
+                // We are returning success here for not leaking the registered emails for unauthorized users.
                 return Response.Success(message: "Check your email");
             }
 
             await _emailService.SendAsync(new ForgetPasswordEmail(
                 to: user.Email,
-                recipientName: $"{user.FirstName} {user.LastName}",
+                recipientName: user.FirstName,
                 resetLink: await GenerateForgetPasswordUrlAsync(user, dto.ClientUrl)
             ));
 

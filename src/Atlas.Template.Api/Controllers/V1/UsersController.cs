@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Atlas.Template.Api.Controllers.V1
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [ApiVersion(1.0)]
     public class UsersController : BaseController
     {

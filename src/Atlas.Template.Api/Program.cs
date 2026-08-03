@@ -72,6 +72,7 @@ builder.Services.AddDataSeeders();
 builder.Services.AddApplicationServices();
 builder.Services.AddMappingProfiles(builder.Configuration);
 builder.Services.AddOptionsConfigurations(builder.Configuration);
+builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
 
 builder.Services.AddApiVersioning(options =>
 {
