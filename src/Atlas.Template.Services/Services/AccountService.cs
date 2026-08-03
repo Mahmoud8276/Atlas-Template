@@ -57,6 +57,14 @@ namespace Atlas.Template.Services.Services
             return confirmEmailUrl;
         }
 
+        private async Task<string> GenerateForgetPasswordUrlAsync(AppUser appUser, string clientUrl)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(appUser);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var forgetPasswordUrl = $"{clientUrl}?userId={appUser.Id}&token={encodedToken}";
+            return forgetPasswordUrl;
+        }
+
 
 
         public async Task<Response> RegisterUserAsync(RegisterDto dto)
@@ -145,6 +153,42 @@ namespace Atlas.Template.Services.Services
             }
 
             return Response.Success(message:"Email confirmed successfully");
+        }
+
+        public async Task<Response> ForgetPasswordAsync(ForgetPasswordDto dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if(user == null)
+            {
+                // We returned success here for not leaking the registered emails for unauthorized users.
+                return Response.Success(message: "Check your email");
+            }
+
+            await _emailService.SendAsync(new ForgetPasswordEmail(
+                to: user.Email,
+                recipientName: $"{user.FirstName} {user.LastName}",
+                resetLink: await GenerateForgetPasswordUrlAsync(user, dto.ClientUrl)
+            ));
+
+            return Response.Success(message: "Plase, check your inbox");
+        }
+
+        public async Task<Response> ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(dto.UserId);
+            if (user == null)
+                return Response.Fail("User not found", (int)HttpStatusCode.NotFound);
+
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(dto.Token));
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, dto.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+                return Response.Fail("Password reset failed", (int)HttpStatusCode.BadRequest, $"{errors}");
+            }
+
+            return Response.Success(message: "Password has been reset successfully!");
         }
     }
 }

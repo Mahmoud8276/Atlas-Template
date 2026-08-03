@@ -33,11 +33,27 @@ namespace Atlas.Template.Api.Controllers.V1
         }
 
 
-        // POST api/v1/account/confirm-email
+        // GET api/v1/account/confirm-email
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
         {
             var result = await _accountService.ConfirmEmailAsync(userId, token);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        // POST api/v1/account/forget-password
+        [HttpPost("forget-password")]
+        public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto dto)
+        {
+            var result = await _accountService.ForgetPasswordAsync(dto);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        // POST api/v1/account/reset-password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            var result = await _accountService.ResetPasswordAsync(dto);
             return StatusCode((int)result.StatusCode, result);
         }
 

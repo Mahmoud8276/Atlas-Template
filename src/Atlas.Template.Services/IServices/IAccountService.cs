@@ -9,5 +9,7 @@ namespace Atlas.Template.Services.IServices
         public Task<Response> RegisterUserAsync(RegisterDto dto);
         public Task<Response> LoginUserAsync(LoginDto dto);
         public Task<Response> ConfirmEmailAsync(string userId, string token);
+        public Task<Response> ForgetPasswordAsync(ForgetPasswordDto dto);
+        public Task<Response> ResetPasswordAsync(ResetPasswordDto dto);
     }
 }
