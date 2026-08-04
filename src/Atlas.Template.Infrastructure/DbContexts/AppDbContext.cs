@@ -17,5 +17,6 @@ namespace Atlas.Template.Infrastructure.DbContexts
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }
