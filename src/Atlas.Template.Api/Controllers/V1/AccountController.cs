@@ -31,7 +31,9 @@ namespace Atlas.Template.Api.Controllers.V1
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var result = await _accountService.LoginUserAsync(dto);
-            SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
+            if(result.IsSuccess)
+                SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
+            
             return StatusCode((int)result.StatusCode, result);
         }
 
@@ -60,12 +62,27 @@ namespace Atlas.Template.Api.Controllers.V1
             return StatusCode((int)result.StatusCode, result);
         }
 
+        // GET api/v1/account/refresh-token
+        [HttpGet("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new UnauthorizedAccessException("Refresh token is missing from cookies.");
+
+            var result = await _accountService.RefreshTokenAsync(refreshToken);
+            if (result.IsSuccess)
+                SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
+            
+            return StatusCode((int)result.StatusCode, result);
+        }
+
         private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
         {
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = expires
+                Expires = expires.ToLocalTime()
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }

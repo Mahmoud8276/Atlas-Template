@@ -11,5 +11,6 @@ namespace Atlas.Template.Services.IServices
         public Task<Response> ConfirmEmailAsync(string userId, string token);
         public Task<Response> ForgetPasswordAsync(ForgetPasswordDto dto);
         public Task<Response> ResetPasswordAsync(ResetPasswordDto dto);
+        public Task<Response<LoginDetailsDto>> RefreshTokenAsync(string refreshToken);
     }
 }

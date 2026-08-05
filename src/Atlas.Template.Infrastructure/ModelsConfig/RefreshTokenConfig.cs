@@ -8,8 +8,7 @@ namespace Atlas.Template.Infrastructure.ModelsConfig
     {
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
-            builder.Property(x => x.CreatedOn)
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+
         }
     }
 }

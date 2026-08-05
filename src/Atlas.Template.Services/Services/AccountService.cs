@@ -211,5 +211,37 @@ namespace Atlas.Template.Services.Services
 
             return Response.Success(message: "Password has been reset successfully!");
         }
+
+        public async Task<Response<LoginDetailsDto>> RefreshTokenAsync(string refreshToken)
+        {
+            var user = await _userManager.Users.Include(u => u.RefreshTokens)
+                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == refreshToken));
+            
+            if(user == null)
+                return Response<LoginDetailsDto>.Fail("Invalid token",
+                    (int)HttpStatusCode.Unauthorized);
+
+            var token = user.RefreshTokens.Single(t => t.Token == refreshToken);
+            if(!token.IsActive)
+                return Response<LoginDetailsDto>.Fail("Invalid token",
+                    (int)HttpStatusCode.Unauthorized);
+
+            token.RevokedOn = DateTime.UtcNow;
+
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+            user.RefreshTokens.Add(newRefreshToken);
+            await _userManager.UpdateAsync(user);
+
+            var userDetails = user.Adapt<AppUserDetailsDto>();
+            userDetails.Roles = (await _userManager.GetRolesAsync(user)).ToList();
+
+            return Response<LoginDetailsDto>.Success(new LoginDetailsDto()
+            {
+                User = userDetails,
+                AccessToken = await _tokenService.GenerateAccessTokenAsync(user),
+                RefreshToken = newRefreshToken.Token,
+                RefreshTokenExpiration = newRefreshToken.ExpiresOn
+            });
+        }
     }
 }
