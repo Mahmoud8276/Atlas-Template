@@ -14,7 +14,7 @@ namespace Atlas.Template.Services.Helpers
         /// <param name="file">The file you want to upload.</param>
         /// <param name="folderName">The folder name in which you want the file to be stored.</param>
         /// <returns></returns>
-        public async static Task<string> UploadFile(IFormFile file, string folderName)
+        public async static Task<string> UploadFileAsync(IFormFile file, string folderName)
         {
             if (file == null)
                 return String.Empty;
@@ -34,7 +34,7 @@ namespace Atlas.Template.Services.Helpers
         /// <param name="fileName">The file name you want to delete.</param>
         /// <param name="folderName">The folder name inside 'files' folder, where your file exists.</param>
         /// <returns></returns>
-        public async static Task DeleteFile(string fileName, string folderName)
+        public async static Task DeleteFileAsync(string fileName, string folderName)
         {
             if (fileName is not null && folderName is not null)
             {

@@ -47,6 +47,14 @@ namespace Atlas.Template.Api.Controllers.V1
             return StatusCode((int)result.StatusCode, result);
         }
 
+        // POST api/v1/account/confirm-email
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto dto)
+        {
+            var result = await _accountService.SendConfirmEmailAsync(dto);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
         // POST api/v1/account/forget-password
         [HttpPost("forget-password")]
         public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordDto dto)

@@ -1,6 +1,7 @@
 ﻿using Atlas.Template.Core.Dtos.AccountDtos;
 using Atlas.Template.Core.Dtos.AppUserDtos;
 using Atlas.Template.Core.Enums;
+using Atlas.Template.Core.Interfaces;
 using Atlas.Template.Core.Models;
 using Atlas.Template.Services.Emails;
 using Atlas.Template.Services.Helpers;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Net;
@@ -20,9 +22,6 @@ using System.Threading.Tasks;
 namespace Atlas.Template.Services.Services
 {
 
-    // TODO: Wrap all the service methods in a DB transactions,
-    // so that if any operation fails, the entire transaction
-    // is rolled back to maintain data integrity.
     public class AccountService : IAccountService
     {
         private readonly SignInManager<AppUser> _signInManager;
@@ -30,19 +29,25 @@ namespace Atlas.Template.Services.Services
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<AccountService> _logger;
 
         public AccountService(
             SignInManager<AppUser> signInManager,
             UserManager<AppUser> userManager,
             ITokenService tokenService,
             IConfiguration configuration,
-            IEmailService emailService)
+            IEmailService emailService,
+            IUnitOfWork unitOfWork,
+            ILogger<AccountService> logger)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _tokenService = tokenService;
             _configuration = configuration;
             _emailService = emailService;
+            _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         private async Task<bool> UserExistsAsync(string email)
@@ -66,6 +71,14 @@ namespace Atlas.Template.Services.Services
             var forgetPasswordUrl = $"{clientUrl}?userId={appUser.Id}&token={encodedToken}";
             return forgetPasswordUrl;
         }
+        private async Task RemoveUserImageAsync(string? imageName)
+        {
+            if (!string.IsNullOrEmpty(imageName))
+            {
+                await FileHelper.DeleteFileAsync(imageName, "UserImages");
+            }
+        }
+
 
 
 
@@ -86,32 +99,55 @@ namespace Atlas.Template.Services.Services
 
             if(dto.UserImage != null) 
             {
-                var imageName = await FileHelper.UploadFile(dto.UserImage, "UserImages");
+                var imageName = await FileHelper.UploadFileAsync(dto.UserImage, "UserImages");
                 appUser.Image = imageName;
             }
 
-            var result = await _userManager.CreateAsync(appUser, dto.Password);
-            if (!result.Succeeded)
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+            try
             {
-                var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                return Response.Fail("User registration failed", 
-                    (int)HttpStatusCode.BadRequest, $"{errors}");
+                var result = await _userManager.CreateAsync(appUser, dto.Password);
+                if (!result.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    await RemoveUserImageAsync(appUser.Image);
+                    var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+                    return Response.Fail("User registration failed",
+                        (int)HttpStatusCode.BadRequest, $"{errors}");
+                }
+
+                result = await _userManager.AddToRoleAsync(appUser, AppUserRoles.User.ToString());
+                if (!result.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    await RemoveUserImageAsync(appUser.Image);
+                    var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+                    return Response.Fail("Failed to assign role to user",
+                        (int)HttpStatusCode.InternalServerError, $"{errors}");
+                }
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                await RemoveUserImageAsync(appUser.Image);
+                throw;
             }
 
-            result = await _userManager.AddToRoleAsync(appUser, AppUserRoles.User.ToString());
-            if (!result.Succeeded)
+            try
             {
-                var errors = string.Join(", ", result.Errors.Select(x => x.Description));
-                return Response.Fail("Failed to assign role to user",
-                    (int)HttpStatusCode.InternalServerError, $"{errors}");
+                await _emailService.SendAsync(new ConfirmAccountEmail(
+                    to: appUser.Email,
+                    recipientName: $"{appUser.FirstName} {appUser.LastName}",
+                    firstName: appUser.FirstName,
+                    emailConfirmationLink: await GenerateConfirmEmailUrlAsync(appUser)));
             }
-
-            await _emailService.SendAsync(new ConfirmAccountEmail(
-                to: appUser.Email,
-                recipientName: $"{appUser.FirstName} {appUser.LastName}",
-                firstName: appUser.FirstName,
-                emailConfirmationLink: await GenerateConfirmEmailUrlAsync(appUser)
-                ));
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Registration succeeded but confirmation email failed to send for {Email}", appUser.Email);
+                return Response.Success(message: "Registered successfully, but we couldn't send your confirmation email — please use \"resend confirmation\" to try again.");
+            }
 
             return Response.Success(message: "registered successfully, please check your email to confirm your account");
         }
@@ -176,20 +212,46 @@ namespace Atlas.Template.Services.Services
             return Response.Success(message:"Email confirmed successfully");
         }
 
+        public async Task<Response> SendConfirmEmailAsync(ConfirmEmailDto dto)
+        {
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null || user.EmailConfirmed)
+                return Response.Success(message: "Check your inbox, please!");
+
+            try
+            {
+                await _emailService.SendAsync(new ConfirmAccountEmail(
+                    to: user.Email,
+                    recipientName: $"{user.FirstName} {user.LastName}",
+                    firstName: user.FirstName,
+                    emailConfirmationLink: await GenerateConfirmEmailUrlAsync(user)));
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to resend confirmation email for {Email}", user.Email);
+            }
+            
+            return Response.Success(message: "Check your inbox, please!");
+        }
+
         public async Task<Response> ForgetPasswordAsync(ForgetPasswordDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if(user == null)
-            {
-                // We are returning success here for not leaking the registered emails for unauthorized users.
                 return Response.Success(message: "Check your email");
-            }
 
-            await _emailService.SendAsync(new ForgetPasswordEmail(
-                to: user.Email,
-                recipientName: user.FirstName,
-                resetLink: await GenerateForgetPasswordUrlAsync(user, dto.ClientUrl)
-            ));
+            try
+            {
+                await _emailService.SendAsync(new ForgetPasswordEmail(
+                    to: user.Email,
+                    recipientName: user.FirstName,
+                    resetLink: await GenerateForgetPasswordUrlAsync(user, dto.ClientUrl)
+                ));
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send forget password email for {Email}", user.Email);
+            }
 
             return Response.Success(message: "Plase, check your inbox");
         }
@@ -263,5 +325,6 @@ namespace Atlas.Template.Services.Services
 
             return Response.Success(message: "Refresh token revoked successfully");
         }
+
     }
 }

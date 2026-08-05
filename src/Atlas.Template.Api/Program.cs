@@ -70,6 +70,7 @@ builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddIdentityConfigurations();
 builder.Services.AddDataSeeders();
 builder.Services.AddApplicationServices();
+builder.Services.AddRepositories();
 builder.Services.AddMappingProfiles(builder.Configuration);
 builder.Services.AddOptionsConfigurations(builder.Configuration);
 builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
