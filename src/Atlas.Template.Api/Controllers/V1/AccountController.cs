@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Atlas.Template.Core.Dtos.AccountDtos;
+using Atlas.Template.Core.Exceptions;
 using Atlas.Template.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -68,7 +69,7 @@ namespace Atlas.Template.Api.Controllers.V1
         {
             var refreshToken = Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
-                throw new UnauthorizedAccessException("Refresh token is missing from cookies.");
+                throw new BadRequestException("Refresh token is missing from cookies.");
 
             var result = await _accountService.RefreshTokenAsync(refreshToken);
             if (result.IsSuccess)
@@ -76,6 +77,20 @@ namespace Atlas.Template.Api.Controllers.V1
             
             return StatusCode((int)result.StatusCode, result);
         }
+
+        // POST api/v1/account/revoke-token
+        [HttpPost("revoke-token")]
+        public async Task<IActionResult> RevokeToken([FromBody] RevokeTokenDto dto)
+        {
+            var refreshToken = dto.RefreshToken ?? Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+                throw new BadRequestException("Refresh token is required.");
+
+            var result = await _accountService.RevokeRefreshTokenAsync(refreshToken);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+
 
         private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
         {

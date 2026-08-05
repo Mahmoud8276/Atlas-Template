@@ -219,12 +219,12 @@ namespace Atlas.Template.Services.Services
             
             if(user == null)
                 return Response<LoginDetailsDto>.Fail("Invalid token",
-                    (int)HttpStatusCode.Unauthorized);
+                    (int)HttpStatusCode.BadRequest);
 
             var token = user.RefreshTokens.Single(t => t.Token == refreshToken);
             if(!token.IsActive)
                 return Response<LoginDetailsDto>.Fail("Invalid token",
-                    (int)HttpStatusCode.Unauthorized);
+                    (int)HttpStatusCode.BadRequest);
 
             token.RevokedOn = DateTime.UtcNow;
 
@@ -242,6 +242,26 @@ namespace Atlas.Template.Services.Services
                 RefreshToken = newRefreshToken.Token,
                 RefreshTokenExpiration = newRefreshToken.ExpiresOn
             });
+        }
+
+        public async Task<Response> RevokeRefreshTokenAsync(string refreshToken)
+        {
+            var user = await _userManager.Users.Include(u => u.RefreshTokens)
+                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == refreshToken));
+
+            if (user == null)
+                return Response.Fail("Invalid token",
+                    (int)HttpStatusCode.BadRequest);
+
+            var token = user.RefreshTokens.Single(t => t.Token == refreshToken);
+            if (!token.IsActive)
+                return Response.Fail("Invalid token",
+                    (int)HttpStatusCode.BadRequest);
+
+            token.RevokedOn = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+
+            return Response.Success(message: "Refresh token revoked successfully");
         }
     }
 }

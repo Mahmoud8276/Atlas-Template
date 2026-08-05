@@ -12,5 +12,6 @@ namespace Atlas.Template.Services.IServices
         public Task<Response> ForgetPasswordAsync(ForgetPasswordDto dto);
         public Task<Response> ResetPasswordAsync(ResetPasswordDto dto);
         public Task<Response<LoginDetailsDto>> RefreshTokenAsync(string refreshToken);
+        public Task<Response> RevokeRefreshTokenAsync(string refreshToken);
     }
 }
