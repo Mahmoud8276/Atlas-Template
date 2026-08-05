@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace Atlas.Template.Services.Services
 {
@@ -58,6 +59,21 @@ namespace Atlas.Template.Services.Services
                 signingCredentials: SigningCredintials);
 
             return new JwtSecurityTokenHandler().WriteToken(tokenGenerator);
+        }
+
+        public RefreshToken GenerateRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+            }
+
+            return new RefreshToken()
+            {
+                Token = Convert.ToBase64String(randomNumber),
+                ExpiresOn = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpirationInDays"]))
+            };
         }
     }
 }

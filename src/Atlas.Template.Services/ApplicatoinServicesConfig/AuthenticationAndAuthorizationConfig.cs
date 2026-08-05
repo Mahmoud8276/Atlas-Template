@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 
 namespace Atlas.Template.Services.ApplicatoinServicesConfig
@@ -26,6 +27,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+                    ClockSkew = TimeSpan.Zero
                 };
 
                 options.Events = JwtBearerEventsConfig.Build();

@@ -9,7 +9,9 @@ using Atlas.Template.Services.Responses;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -114,27 +116,46 @@ namespace Atlas.Template.Services.Services
             return Response.Success(message: "registered successfully, please check your email to confirm your account");
         }
 
-        public async Task<Response> LoginUserAsync(LoginDto dto)
+        public async Task<Response<LoginDetailsDto>> LoginUserAsync(LoginDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-            if(user is null)
-                return Response.Fail("Invalid Email Or Password!",
+            var user = await _userManager.Users
+                                        .Include(u=>u.RefreshTokens)
+                                        .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user is null)
+                return Response<LoginDetailsDto>.Fail("Invalid Email Or Password!",
                     (int)HttpStatusCode.Unauthorized);
 
             if(!user.EmailConfirmed)
-                return Response.Fail("Email is not confirmed!",
+                return Response<LoginDetailsDto>.Fail("Email is not confirmed!",
                     (int)HttpStatusCode.Unauthorized);
 
 
             var signInResult = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
             if(!signInResult.Succeeded)
-                return Response.Fail("Invalid Email Or Password!",
+                return Response<LoginDetailsDto>.Fail("Invalid Email Or Password!",
                     (int)HttpStatusCode.Unauthorized);
 
-            return Response.Success(new
+            RefreshToken refreshToken; 
+            if(user.RefreshTokens.Any(token => token.IsActive))
             {
-                user = user.Adapt<AppUserDetailsDto>(),
-                token = await _tokenService.GenerateAccessTokenAsync(user)
+                refreshToken = user.RefreshTokens.First(token => token.IsActive);
+            }
+            else
+            {
+                refreshToken = _tokenService.GenerateRefreshToken();
+                user.RefreshTokens.Add(refreshToken);
+                await _userManager.UpdateAsync(user);
+            }
+
+            var userDetails = user.Adapt<AppUserDetailsDto>();
+            userDetails.Roles = (await _userManager.GetRolesAsync(user)).ToList();
+
+            return Response<LoginDetailsDto>.Success(new LoginDetailsDto()
+            {
+                User = userDetails,
+                AccessToken = await _tokenService.GenerateAccessTokenAsync(user),
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiration = refreshToken.ExpiresOn
             });
         }
 

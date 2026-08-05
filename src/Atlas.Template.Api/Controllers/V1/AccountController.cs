@@ -1,7 +1,9 @@
 ﻿using Asp.Versioning;
 using Atlas.Template.Core.Dtos.AccountDtos;
 using Atlas.Template.Services.IServices;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Atlas.Template.Api.Controllers.V1
@@ -29,6 +31,7 @@ namespace Atlas.Template.Api.Controllers.V1
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var result = await _accountService.LoginUserAsync(dto);
+            SetRefreshTokenInCookie(result.Data.RefreshToken, result.Data.RefreshTokenExpiration);
             return StatusCode((int)result.StatusCode, result);
         }
 
@@ -57,5 +60,14 @@ namespace Atlas.Template.Api.Controllers.V1
             return StatusCode((int)result.StatusCode, result);
         }
 
+        private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = expires
+            };
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
     }
 }
