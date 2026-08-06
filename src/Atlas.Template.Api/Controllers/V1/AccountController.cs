@@ -76,7 +76,7 @@ namespace Atlas.Template.Api.Controllers.V1
         public async Task<IActionResult> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            //if (string.IsNullOrEmpty(refreshToken))
+            if (string.IsNullOrEmpty(refreshToken))
                 return StatusCode(400, ApiResponse.Fail("Refresh token is required."));
 
             var result = await _accountService.RefreshTokenAsync(refreshToken);

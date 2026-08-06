@@ -13,16 +13,25 @@ namespace Atlas.Template.Infrastructure.DataSeeders
         public int Order => 2;
 
         // Add admin users to the list below
-        private readonly List<AppUser> _admins = new List<AppUser>
+        private readonly (AppUser User, string Password)[] _admins =
         {
-            new AppUser()
+            (new AppUser()
             {
                 FirstName = "Mahmoud",
                 LastName = "Nader",
                 Email = "medonader567@gmail.com",
                 UserName = "MahmoudNader",
                 PhoneNumber = "01000000000"
-            }
+            }, "MahmoudNader@admin123"),
+            (new AppUser()
+            {
+                FirstName = "Admin",
+                LastName = "02",
+                Email = "admin@gmail.com",
+                UserName = "Admin02",
+                PhoneNumber = "01000000000"
+            }, "Admin2@admin123"),
+
         };
 
         private readonly UserManager<AppUser> _usermanager;
@@ -36,19 +45,19 @@ namespace Atlas.Template.Infrastructure.DataSeeders
 
             foreach(var admin in _admins)
             {
-                if (admin.Email == null)
+                if (admin.User.Email == null)
                     continue;
 
-                var user = await _usermanager.FindByEmailAsync(admin.Email);
+                var user = await _usermanager.FindByEmailAsync(admin.User.Email);
                 if (user != null)
                     continue;
 
-                var result = await _usermanager.CreateAsync(admin, "Admin@123");
+                var result = await _usermanager.CreateAsync(admin.User, admin.Password);
                 if (result.Succeeded)
                 {
-                    await _usermanager.AddToRoleAsync(admin, AppUserRoles.Admin.ToString());
-                    string emailConfirmationToken = await _usermanager.GenerateEmailConfirmationTokenAsync(admin);
-                    await _usermanager.ConfirmEmailAsync(admin, emailConfirmationToken);
+                    await _usermanager.AddToRoleAsync(admin.User, AppUserRoles.Admin.ToString());
+                    string emailConfirmationToken = await _usermanager.GenerateEmailConfirmationTokenAsync(admin.User);
+                    await _usermanager.ConfirmEmailAsync(admin.User, emailConfirmationToken);
                 }
             }
         }
