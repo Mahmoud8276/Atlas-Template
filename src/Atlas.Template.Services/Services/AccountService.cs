@@ -8,6 +8,7 @@ using Atlas.Template.Services.Helpers;
 using Atlas.Template.Services.IServices;
 using Atlas.Template.Services.Responses;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,7 @@ namespace Atlas.Template.Services.Services
         private readonly IEmailService _emailService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<AccountService> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AccountService(
             SignInManager<AppUser> signInManager,
@@ -39,7 +41,8 @@ namespace Atlas.Template.Services.Services
             IConfiguration configuration,
             IEmailService emailService,
             IUnitOfWork unitOfWork,
-            ILogger<AccountService> logger)
+            ILogger<AccountService> logger,
+            IHttpContextAccessor httpContextAccessor)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -48,6 +51,7 @@ namespace Atlas.Template.Services.Services
             _emailService = emailService;
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         private async Task<bool> UserExistsAsync(string email)
@@ -183,7 +187,7 @@ namespace Atlas.Template.Services.Services
                 await _userManager.UpdateAsync(user);
             }
 
-            var userDetails = user.Adapt<AppUserDetailsDto>();
+            var userDetails = user.Adapt<UserDetailsDto>();
             userDetails.Roles = (await _userManager.GetRolesAsync(user)).ToList();
 
             return Response<LoginDetailsDto>.Success(new LoginDetailsDto()
@@ -294,7 +298,7 @@ namespace Atlas.Template.Services.Services
             user.RefreshTokens.Add(newRefreshToken);
             await _userManager.UpdateAsync(user);
 
-            var userDetails = user.Adapt<AppUserDetailsDto>();
+            var userDetails = user.Adapt<UserDetailsDto>();
             userDetails.Roles = (await _userManager.GetRolesAsync(user)).ToList();
 
             return Response<LoginDetailsDto>.Success(new LoginDetailsDto()
@@ -326,5 +330,99 @@ namespace Atlas.Template.Services.Services
             return Response.Success(message: "Refresh token revoked successfully");
         }
 
+        public async Task<Response> GetUserDataAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
+            var user = await _userManager.FindByIdAsync(userId);
+            if(user == null) 
+                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+
+            var userDetails = user.Adapt<UserDetailsDto>();
+            userDetails.Roles = (await _userManager.GetRolesAsync(user)).ToList();
+
+            return Response.Success(data: userDetails);
+        }
+
+        public async Task<Response> UpdateUserDataAsync(UpdateUserDto dto)
+        {
+            var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+
+            var previousImage = user.Image;
+
+            user.FirstName = dto.FirstName ?? user.FirstName;
+            user.LastName = dto.LastName ?? user.LastName;
+            user.PhoneNumber = dto.PhoneNumber ?? user.PhoneNumber;
+
+            string? newlyUploadedImage = null;
+            if (dto.RemoveImage)
+            {
+                user.Image = null;
+            }
+            else if (dto.UserImage != null)
+            {
+                newlyUploadedImage = await FileHelper.UploadFileAsync(dto.UserImage, "UserImages");
+                user.Image = newlyUploadedImage;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                if (newlyUploadedImage != null)
+                    await RemoveUserImageAsync(newlyUploadedImage);
+
+                var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+                return Response.Fail("Failed to update profile", statusCode: (int)HttpStatusCode.BadRequest, details: errors);
+            }
+
+            if ((dto.RemoveImage || newlyUploadedImage != null) && !string.IsNullOrEmpty(previousImage))
+                await RemoveUserImageAsync(previousImage);
+
+            var userDetails = user.Adapt<UserDetailsDto>();
+            userDetails.Roles = (await _userManager.GetRolesAsync(user)).ToList();
+
+            return Response.Success(userDetails);
+        }
+
+        public async Task<Response> DeleteUserDataAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+
+            var previousImage = user.Image;
+
+            var result = await _userManager.DeleteAsync(user);
+            if(!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+                return Response.Fail("Failed to delete user", statusCode: (int)HttpStatusCode.BadRequest, details: errors);
+            }
+
+            await RemoveUserImageAsync(previousImage);
+
+            return Response.Success(message: "User deleted successfully");
+        }
+
+        public async Task<Response> ChangePasswordAsync(ChangePasswordDto dto)
+        {
+            var userId = _httpContextAccessor.HttpContext.GetRequiredUserId();
+            var user = await _userManager.FindByIdAsync(userId);
+            if(user == null)
+                return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
+
+            var resetPasswordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetPasswordToken, dto.NewPassword);
+            if(!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(x => x.Description));
+                return Response.Fail("Failed to change user password", statusCode: (int)HttpStatusCode.BadRequest, details: errors);
+            }
+
+            return Response.Success(message: "User password has been changed successfully");
+        }
     }
 }

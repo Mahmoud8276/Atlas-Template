@@ -1,4 +1,5 @@
 ﻿using Atlas.Template.Core.Dtos.AccountDtos;
+using Atlas.Template.Core.Dtos.AppUserDtos;
 using Atlas.Template.Services.Responses;
 using System.Threading.Tasks;
 
@@ -13,6 +14,10 @@ namespace Atlas.Template.Services.IServices
         public Task<Response> ForgetPasswordAsync(ForgetPasswordDto dto);
         public Task<Response> ResetPasswordAsync(ResetPasswordDto dto);
         public Task<Response<LoginDetailsDto>> RefreshTokenAsync(string refreshToken);
+        public Task<Response> ChangePasswordAsync(ChangePasswordDto dto);
         public Task<Response> RevokeRefreshTokenAsync(string refreshToken);
+        public Task<Response> GetUserDataAsync();
+        public Task<Response> UpdateUserDataAsync(UpdateUserDto dto);
+        public Task<Response> DeleteUserDataAsync();
     }
 }

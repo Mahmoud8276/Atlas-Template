@@ -1,7 +1,9 @@
 ﻿using Asp.Versioning;
 using Atlas.Template.Api.Responses;
 using Atlas.Template.Core.Dtos.AccountDtos;
+using Atlas.Template.Core.Dtos.AppUserDtos;
 using Atlas.Template.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -99,6 +101,41 @@ namespace Atlas.Template.Api.Controllers.V1
         }
 
 
+        // GET api/v1/account/me
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetUserData()
+        {
+            var result = await _accountService.GetUserDataAsync();
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        // POST api/v1/account/change-password
+        [Authorize]
+        [HttpPost("me/change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            var result = await _accountService.ChangePasswordAsync(dto);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        // PUT api/v1/account/me
+        [Authorize]
+        [HttpPatch("me")]
+        public async Task<IActionResult> UpdateUserData([FromForm] UpdateUserDto dto)
+        {
+            var result = await _accountService.UpdateUserDataAsync(dto);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        // DELETE api/v1/account/me
+        [Authorize]
+        [HttpDelete("me")]
+        public async Task<IActionResult> DeleteUserData()
+        {
+            var result = await _accountService.DeleteUserDataAsync();
+            return StatusCode((int)result.StatusCode, result);
+        }
 
         private void SetRefreshTokenInCookie(string refreshToken, DateTime expires)
         {

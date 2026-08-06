@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Atlas.Template.Core.Dtos.AppUserDtos
 {
-    public class AppUserDetailsDto
+    public class UserDetailsDto
     {
         public object Id { get; set; }
         public List<string> Roles { get; set; } = new List<string>();

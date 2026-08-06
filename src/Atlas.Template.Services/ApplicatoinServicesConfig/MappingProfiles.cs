@@ -15,7 +15,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
             var BaseUrl = config["Storage:BaseUrl"];
 
 
-            TypeAdapterConfig<AppUser, AppUserDetailsDto>
+            TypeAdapterConfig<AppUser, UserDetailsDto>
                 .NewConfig()
                 .Map(dest => dest.ImageUrl, src => $"{BaseUrl}/files/UserImages/{src.Image}");
 

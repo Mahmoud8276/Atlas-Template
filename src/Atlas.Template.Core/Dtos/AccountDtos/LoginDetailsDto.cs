@@ -6,7 +6,7 @@ namespace Atlas.Template.Core.Dtos.AccountDtos
 {
     public class LoginDetailsDto
     {
-        public AppUserDetailsDto User { get; set; }
+        public UserDetailsDto User { get; set; }
         public string AccessToken { get; set; }
 
         [JsonIgnore]

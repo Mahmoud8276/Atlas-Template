@@ -42,7 +42,7 @@ namespace Atlas.Template.Services.Services
                 specParams.PageIndex,
                 specParams.PageSize,
                 usersCount,
-                users.Adapt<List<AppUserDetailsDto>>());
+                users.Adapt<List<UserDetailsDto>>());
 
             return Response.Success(data: pagination);
         }
@@ -54,7 +54,7 @@ namespace Atlas.Template.Services.Services
                 return Response.Fail(message: "User not found", 
                     statusCode: (int)HttpStatusCode.NotFound);
 
-            return Response.Success(data: user.Adapt<AppUserDetailsDto>());
+            return Response.Success(data: user.Adapt<UserDetailsDto>());
         }
     }
 }
