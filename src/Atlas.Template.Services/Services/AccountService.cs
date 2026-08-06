@@ -414,9 +414,8 @@ namespace Atlas.Template.Services.Services
             if(user == null)
                 return Response.Fail(message: "User does not exist!", statusCode: (int)HttpStatusCode.NotFound);
 
-            var resetPasswordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, resetPasswordToken, dto.NewPassword);
-            if(!result.Succeeded)
+            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+            if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(x => x.Description));
                 return Response.Fail("Failed to change user password", statusCode: (int)HttpStatusCode.BadRequest, details: errors);

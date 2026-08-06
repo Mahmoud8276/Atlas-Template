@@ -4,9 +4,11 @@ namespace Atlas.Template.Core.Dtos.AccountDtos
 {
     public class ChangePasswordDto
     {
+        [Required(ErrorMessage = "Current password is required!")]
+        public string CurrentPassword { get; set; }
+
         [Required(ErrorMessage = "New password is required!")]
         public string NewPassword { get; set; }
-
 
         [Required(ErrorMessage = "Password Confirmation is required!")]
         [Compare("NewPassword")]
