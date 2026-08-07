@@ -13,7 +13,7 @@ namespace Atlas.Template.Services.Services
 {
     public abstract class WriteService<TModel, TKey, TSpecificationParams, TCreateDto, TUpdateDto, TDetailsDto>
         : ReadService<TModel, TKey, TSpecificationParams, TDetailsDto>,
-            IWriteService<TModel, TKey, TCreateDto, TUpdateDto>
+            IWriteService<TModel, TKey, TCreateDto, TUpdateDto, TSpecificationParams>
         where TModel : BaseModel<TKey>
         where TDetailsDto : class
         where TCreateDto : class
