@@ -1,0 +1,70 @@
+<svg viewBox="0 0 900 680" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
+  <defs>
+    <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="680" fill="#ffffff"/>
+  <text x="450" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#1e293b">Two Paths to a Consistent ProblemDetails Response</text>
+  <text x="450" y="58" text-anchor="middle" font-size="13" fill="#64748b">Unhandled exceptions and auth failures both end up as the same RFC 9110 shape</text>
+
+  <!-- Left path: thrown exceptions -->
+  <text x="230" y="94" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">Path A — Thrown exception</text>
+
+  <rect x="90" y="110" width="280" height="56" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="230" y="134" text-anchor="middle" font-size="12.5" fill="#334155">Code throws AppException</text>
+  <text x="230" y="152" text-anchor="middle" font-size="11.5" fill="#64748b">(NotFoundException, ConflictException, ...) or a framework exception</text>
+
+  <line x1="230" y1="166" x2="230" y2="200" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+  <rect x="90" y="202" width="280" height="56" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="230" y="226" text-anchor="middle" font-size="12.5" fill="#334155">ASP.NET Core exception middleware</text>
+  <text x="230" y="244" text-anchor="middle" font-size="11.5" fill="#64748b">catches it, hands off to IExceptionHandler</text>
+
+  <line x1="230" y1="258" x2="230" y2="292" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+  <rect x="90" y="294" width="280" height="70" rx="8" fill="#1e293b"/>
+  <text x="230" y="316" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">GlobalExceptionHandler</text>
+  <text x="230" y="334" text-anchor="middle" font-size="11.5" fill="#cbd5e1">MapExceptions() picks status + title</text>
+  <text x="230" y="350" text-anchor="middle" font-size="11.5" fill="#cbd5e1">logs the error with TraceId</text>
+
+  <!-- Right path: JWT events -->
+  <text x="670" y="94" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">Path B — Auth failure</text>
+
+  <rect x="530" y="110" width="280" height="56" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="670" y="134" text-anchor="middle" font-size="12.5" fill="#334155">Missing/invalid/expired bearer token</text>
+  <text x="670" y="152" text-anchor="middle" font-size="11.5" fill="#64748b">or user lacks the required role</text>
+
+  <line x1="670" y1="166" x2="670" y2="200" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+  <rect x="530" y="202" width="280" height="56" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="670" y="226" text-anchor="middle" font-size="12.5" fill="#334155">JwtBearerEventsConfig</text>
+  <text x="670" y="244" text-anchor="middle" font-size="11.5" fill="#64748b">OnChallenge (401) / OnForbidden (403)</text>
+
+  <line x1="670" y1="258" x2="670" y2="292" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+  <rect x="530" y="294" width="280" height="70" rx="8" fill="#1e293b"/>
+  <text x="670" y="316" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">Writes ProblemDetails directly</text>
+  <text x="670" y="334" text-anchor="middle" font-size="11.5" fill="#cbd5e1">bypasses GlobalExceptionHandler —</text>
+  <text x="670" y="350" text-anchor="middle" font-size="11.5" fill="#cbd5e1">auth failures aren't exceptions</text>
+
+  <!-- merge -->
+  <line x1="230" y1="364" x2="230" y2="400" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="670" y1="364" x2="670" y2="400" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="230" y1="400" x2="670" y2="400" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="450" y1="400" x2="450" y2="434" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+  <rect x="290" y="436" width="320" height="66" rx="8" fill="#f1f5f9" stroke="#e2e8f0"/>
+  <text x="450" y="458" text-anchor="middle" font-size="12.5" fill="#334155">ProblemDetailsHelper.Create()</text>
+  <text x="450" y="476" text-anchor="middle" font-size="11.5" fill="#64748b">status, title, type (RFC 9110 link), traceId, timestamp</text>
+  <text x="450" y="492" text-anchor="middle" font-size="11.5" fill="#64748b">detail included only in Development or for AppException</text>
+
+  <line x1="450" y1="502" x2="450" y2="536" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow3)"/>
+
+  <rect x="300" y="538" width="300" height="60" rx="8" fill="#2563eb"/>
+  <text x="450" y="562" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">application/problem+json response</text>
+  <text x="450" y="580" text-anchor="middle" font-size="11.5" fill="#dbeafe">sent back to the client</text>
+
+  <text x="450" y="638" text-anchor="middle" font-size="11.5" fill="#94a3b8">Both paths converge so every error the API returns has the same predictable shape.</text>
+</svg>

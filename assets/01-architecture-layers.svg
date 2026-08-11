@@ -1,0 +1,47 @@
+<svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Segoe UI,Roboto,Arial,sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="620" fill="#ffffff"/>
+
+  <text x="450" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#1e293b">Atlas Template — Project Dependency Flow</text>
+  <text x="450" y="64" text-anchor="middle" font-size="13" fill="#64748b">Arrows point from a project to the project it references. Core has no outgoing dependencies.</text>
+
+  <!-- Api layer -->
+  <rect x="150" y="100" width="600" height="90" rx="10" fill="#1e293b"/>
+  <text x="450" y="132" text-anchor="middle" font-size="17" font-weight="700" fill="#ffffff">Atlas.Template.Api</text>
+  <text x="450" y="154" text-anchor="middle" font-size="12.5" fill="#cbd5e1">Controllers · Program.cs · Swagger · Exception Handler · Startup Extensions</text>
+  <text x="450" y="172" text-anchor="middle" font-size="11.5" fill="#94a3b8">Composition root — wires everything together and exposes HTTP endpoints</text>
+
+  <!-- arrow Api -> Services -->
+  <line x1="450" y1="190" x2="450" y2="228" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Services layer -->
+  <rect x="150" y="230" width="600" height="90" rx="10" fill="#2563eb"/>
+  <text x="450" y="262" text-anchor="middle" font-size="17" font-weight="700" fill="#ffffff">Atlas.Template.Services</text>
+  <text x="450" y="284" text-anchor="middle" font-size="12.5" fill="#dbeafe">Business logic · Read/Write service pattern · Auth · Email · Validation · Mapping</text>
+  <text x="450" y="302" text-anchor="middle" font-size="11.5" fill="#bfdbfe">Depends on Core (contracts) and Infrastructure (data access)</text>
+
+  <!-- arrow Services -> Infrastructure -->
+  <line x1="450" y1="320" x2="450" y2="358" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Infrastructure layer -->
+  <rect x="150" y="360" width="600" height="90" rx="10" fill="#475569"/>
+  <text x="450" y="392" text-anchor="middle" font-size="17" font-weight="700" fill="#ffffff">Atlas.Template.Infrastructure</text>
+  <text x="450" y="414" text-anchor="middle" font-size="12.5" fill="#e2e8f0">AppDbContext · Generic Repository · UnitOfWork · Migrations · Data Seeders</text>
+  <text x="450" y="432" text-anchor="middle" font-size="11.5" fill="#cbd5e1">Depends on Core only — knows nothing about HTTP or business rules</text>
+
+  <!-- arrow Infrastructure -> Core -->
+  <line x1="450" y1="450" x2="450" y2="488" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Core layer -->
+  <rect x="150" y="490" width="600" height="90" rx="10" fill="#0f172a"/>
+  <text x="450" y="522" text-anchor="middle" font-size="17" font-weight="700" fill="#ffffff">Atlas.Template.Core</text>
+  <text x="450" y="544" text-anchor="middle" font-size="12.5" fill="#cbd5e1">Models · Interfaces · DTOs · Exceptions · Options · Enums</text>
+  <text x="450" y="562" text-anchor="middle" font-size="11.5" fill="#94a3b8">The innermost layer — no project references, pure contracts and domain shapes</text>
+
+  <text x="450" y="605" text-anchor="middle" font-size="11.5" fill="#94a3b8">Rule of thumb: an inner layer must never reference an outer one.</text>
+</svg>
