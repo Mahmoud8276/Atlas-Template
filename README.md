@@ -1,4 +1,23 @@
-# Atlas Template
+<div align="center">
+
+  <img src="assets/atlas-logo.png" alt="Atlas Template" width="280"/>
+
+  <h3>A reusable ASP.NET Core Web API starter template</h3>
+
+  <p>
+    Build on a solid architecture instead of rebuilding backend infrastructure from scratch.
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white" alt=".NET 8"/>
+    <img src="https://img.shields.io/badge/ASP.NET_Core-8.0-512BD4?logo=dotnet&logoColor=white" alt="ASP.NET Core 8"/>
+    <img src="https://img.shields.io/badge/SQL_Server-CC2927?logo=microsoftsqlserver&logoColor=white" alt="SQL Server"/>
+    <img src="https://img.shields.io/github/license/Mahmoud8276/Atlas-Template" alt="License"/>
+  </p>
+
+</div>
+
+---
 
 Atlas is a reusable ASP.NET Core Web API starter template built on Clean Architecture. It exists so that starting a new backend project doesn't mean re-solving the same setup problems every time — authentication, data access patterns, error handling, validation, and API conventions are already in place and ready to build on top of.
 
@@ -162,10 +181,9 @@ Each file in `docs/` covers one part of the template in a tutorial style — a s
 | 04 | [Read/Write Service Pattern](docs/04-read-write-service-pattern.md) | Building a service on top of `ReadService`/`WriteService` |
 | 05 | [Authentication & JWT](docs/05-authentication-and-jwt.md) | Identity setup, token issuing, refresh rotation, revocation |
 | 06 | [Account & User Endpoints](docs/06-account-and-user-endpoints.md) | Walkthrough of the implemented account and user flows |
-| 07 | [Validation](docs/07-validation.md) | How FluentValidation is wired in today, and how to add a new validator |
-| 08 | [Exception Handling](docs/08-exception-handling.md) | The `AppException` hierarchy and the unified `ProblemDetails` response |
-| 09 | [Email System](docs/09-email-system.md) | The layout-wrapped email templates and how to add a new one |
-| 10 | [Data Seeding](docs/10-data-seeding.md) | Writing a new seeder and how ordering/auto-discovery works |
-| 11 | [API Versioning & Responses](docs/11-api-versioning-and-responses.md) | Version routing, Swagger setup, the `Response<T>` envelope |
-| 12 | [Configuration & Options](docs/12-configuration-and-options.md) | Required settings and the options pattern |
-| 13 | [Building a New Feature](docs/13-building-a-new-feature.md) | End-to-end worked example: entity → migration → spec → repository → service → endpoint |
+| 07 | [Exception Handling](docs/07-exception-handling.md) | The `AppException` hierarchy and the unified `ProblemDetails` response |
+| 08 | [Email System](docs/08-email-system.md) | The layout-wrapped email templates and how to add a new one |
+| 09 | [Data Seeding](docs/09-data-seeding.md) | Writing a new seeder and how ordering/auto-discovery works |
+| 10 | [API Versioning & Responses](docs/10-api-versioning-and-responses.md) | Version routing, Swagger setup, the `Response<T>` envelope |
+| 11 | [Configuration & Options](docs/11-configuration-and-options.md) | Required settings and the options pattern |
+| 12 | [Building a New Feature](docs/12-building-a-new-feature.md) | End-to-end worked example: entity → migration → spec → repository → service → endpoint |
