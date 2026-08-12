@@ -8,7 +8,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
 {
     public static class MappingProfiles
     {
-        public static IServiceCollection AddMappingProfiles(
+        public static IServiceCollection AddMappingProfilesConfigurations(
             this IServiceCollection services,
             IConfiguration config)
         {

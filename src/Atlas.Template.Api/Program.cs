@@ -66,15 +66,6 @@ builder.Services.AddProblemDetails(options =>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 
-builder.Services.AddApplicationDbContext(builder.Configuration);
-builder.Services.AddIdentityConfigurations();
-builder.Services.AddDataSeeders();
-builder.Services.AddApplicationServices();
-builder.Services.AddRepositories();
-builder.Services.AddMappingProfiles(builder.Configuration);
-builder.Services.AddOptionsConfigurations(builder.Configuration);
-builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
-
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -90,6 +81,8 @@ builder.Services.AddApiVersioning()
                  options.GroupNameFormat = "'v'VVV"; 
                  options.SubstituteApiVersionInUrl = true;
              });
+
+builder.Services.AddApplicationServices(builder.Configuration);
 
 
 var app = builder.Build();

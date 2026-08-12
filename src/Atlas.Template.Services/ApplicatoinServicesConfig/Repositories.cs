@@ -6,7 +6,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
 {
     public static class Repositories
     {
-        public static IServiceCollection AddRepositories(this IServiceCollection services)
+        public static IServiceCollection AddRepositoriesConfigurations(this IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

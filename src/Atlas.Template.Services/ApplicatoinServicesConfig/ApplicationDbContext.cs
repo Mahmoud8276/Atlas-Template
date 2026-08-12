@@ -9,7 +9,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
     public static class ApplicationDbContext
     {
 
-        public static IServiceCollection AddApplicationDbContext(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddApplicationDbContextConfigurations(this IServiceCollection services, IConfiguration config)
         {
             var connectionString = config.GetConnectionString("DefaultConnection");
             if(string.IsNullOrEmpty(connectionString))

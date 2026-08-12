@@ -8,7 +8,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
 {
     public static class DataSeeders
     {
-        public static IServiceCollection AddDataSeeders(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddDataSeedersConfigurations(this IServiceCollection serviceCollection)
         {
             var infrastructureAssembly = typeof(AppDbContext).Assembly;
             var assimblyName = infrastructureAssembly.GetName().Name;

@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Atlas.Template.Services.ApplicatoinServicesConfig
 {
-    public static class AuthenticationAndAuthorizationConfig
+    public static class AuthenticationAndAuthorization
     {
-        public static IServiceCollection AddAuthenticationAndAuthorization(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddAuthenticationAndAuthorizationConfigurations(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication(options =>
             {
