@@ -186,4 +186,3 @@ Each file in `docs/` covers one part of the template in a tutorial style — a s
 | 09 | [Data Seeding](docs/09-data-seeding.md) | Writing a new seeder and how ordering/auto-discovery works |
 | 10 | [API Versioning & Responses](docs/10-api-versioning-and-responses.md) | Version routing, Swagger setup, the `Response<T>` envelope |
 | 11 | [Configuration & Options](docs/11-configuration-and-options.md) | Required settings and the options pattern |
-| 12 | [Building a New Feature](docs/12-building-a-new-feature.md) | End-to-end worked example: entity → migration → spec → repository → service → endpoint |
