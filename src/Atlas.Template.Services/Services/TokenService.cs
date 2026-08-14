@@ -1,7 +1,6 @@
 ﻿using Atlas.Template.Core.Models;
 using Atlas.Template.Services.IServices;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -10,27 +9,29 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Options;
+using Atlas.Template.Core.Options;
 
 namespace Atlas.Template.Services.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly IConfiguration _configuration;
+        private readonly JwtOptions _jwtOptions;
         private readonly UserManager<AppUser> _userManager;
         public TokenService(
-            IConfiguration configuration,
+            IOptions<JwtOptions> jwtOptions,
             UserManager<AppUser> userManager)
         {
-            _configuration = configuration;
+            _jwtOptions = jwtOptions.Value;
             _userManager = userManager;
         }
 
         public async Task<string> GenerateAccessTokenAsync(AppUser user)
         {
-            var ExpirationDate = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpirationInMinutes"]));
-            var Audience = _configuration["Jwt:Audience"];
-            var Issuer = _configuration["Jwt:Issuer"];
-            var Key = _configuration["Jwt:Key"];
+            var ExpirationDate = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_jwtOptions.ExpirationInMinutes));
+            var Audience = _jwtOptions.Audience;
+            var Issuer = _jwtOptions.Issuer;
+            var Key = _jwtOptions.Key;
             var UserRoles = await _userManager.GetRolesAsync(user);
 
             var Claims = new List<Claim>()
@@ -72,7 +73,7 @@ namespace Atlas.Template.Services.Services
             return new RefreshToken()
             {
                 Token = Convert.ToBase64String(randomNumber),
-                ExpiresOn = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenExpirationInDays"]))
+                ExpiresOn = DateTime.UtcNow.AddDays(Convert.ToDouble(_jwtOptions.RefreshTokenExpirationInDays))
             };
         }
     }

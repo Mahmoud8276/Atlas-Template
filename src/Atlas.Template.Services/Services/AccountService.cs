@@ -242,7 +242,7 @@ namespace Atlas.Template.Services.Services
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if(user == null)
-                return Response.Success(message: "Check your email");
+                return Response.Success(message: "Check your inbox");
 
             try
             {
@@ -257,7 +257,7 @@ namespace Atlas.Template.Services.Services
                 _logger.LogWarning(ex, "Failed to send forget password email for {Email}", user.Email);
             }
 
-            return Response.Success(message: "Plase, check your inbox");
+            return Response.Success(message: "check your inbox");
         }
 
         public async Task<Response> ResetPasswordAsync(ResetPasswordDto dto)

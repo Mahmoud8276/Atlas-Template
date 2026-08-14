@@ -11,6 +11,7 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
             IConfiguration configuration)
         {
             services.Configure<EmailOptions>(configuration.GetSection("Email"));
+            services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
 
             return services;
         }
