@@ -17,9 +17,6 @@ namespace Atlas.Template.Services.Helpers
                 Detail = detail
             };
 
-            problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
-            problemDetails.Extensions["timestamp"] = DateTime.UtcNow;
-
             return problemDetails;
         }
 

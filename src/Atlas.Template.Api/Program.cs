@@ -8,9 +8,17 @@ using Microsoft.OpenApi.Models;
 using System;
 using Atlas.Template.Api.ExceptionHandlers;
 using System.Text.Json.Serialization;
+using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Serilog Logger configuration
+builder.Host.UseSerilog((hostBuilderContext, serviceProvider, loggerConfiguration) =>
+{
+    loggerConfiguration.ReadFrom.Configuration((builder.Configuration))
+                       .ReadFrom.Services(serviceProvider);
+});
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -53,14 +61,12 @@ builder.Services.AddSwaggerGen(options => {
 });
 
 
-// TODO: Check its presestence
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = ctx =>
     {
         ctx.ProblemDetails.Extensions["traceId"] = ctx.HttpContext.TraceIdentifier;
         ctx.ProblemDetails.Extensions["timestamp"] = DateTime.UtcNow;
-        ctx.ProblemDetails.Extensions["instance"] = $"{ctx.HttpContext.Request.Method} {ctx.HttpContext.Request.Path}";
     };
 });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
