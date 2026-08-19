@@ -150,11 +150,8 @@ Atlas Template uses the standard ASP.NET Core configuration system. Configure th
 
 ## 3. Create and apply the initial migration
 
-navigate to the infrastructure project, and create the initial migration
-
 ```bash
-cd src\Atlas.Template.Infrastructure
-dotnet ef migrations add InitialCreate
+dotnet ef migrations add InitialCreate --project src\Atlas.Template.Infrastructure --startup-project src\Atlas.Template.Api
 ```
 
 ## 4. Run the API
