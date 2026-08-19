@@ -38,11 +38,20 @@ namespace Atlas.Template.Services.Services
             .ToListAsync();
 
 
+            var usersData = users.Select(u =>
+            {
+                var userData = u.Adapt<UserDetailsDto>();
+                userData.Roles = _userManager.GetRolesAsync(u).Result.ToList();
+                return userData;
+            });
+
             var pagination = new Pagination(
                 specParams.PageIndex,
                 specParams.PageSize,
                 usersCount,
-                users.Adapt<List<UserDetailsDto>>());
+                usersData
+                );
+
 
             return Response.Success(data: pagination);
         }
@@ -54,7 +63,9 @@ namespace Atlas.Template.Services.Services
                 return Response.Fail(message: "User not found", 
                     statusCode: (int)HttpStatusCode.NotFound);
 
-            return Response.Success(data: user.Adapt<UserDetailsDto>());
+            var userData = user.Adapt<UserDetailsDto>();
+            userData.Roles = (await _userManager.GetRolesAsync(user)).ToList();
+            return Response.Success(data: userData);
         }
     }
 }
