@@ -148,7 +148,13 @@ Atlas Template uses the standard ASP.NET Core configuration system. Configure th
 
 > **Tip:** Do not commit real passwords, connection strings, or JWT keys. Use [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) for local development.
 
-## 3. Run the API
+## 3. Create and apply the initial migration
+
+```bash
+dotnet ef migrations add InitialCreate --project src\Atlas.Template.Infrastructure --startup-project src\Atlas.Template.Api
+```
+
+## 4. Run the API
 
 Restore dependencies and start the API:
 
@@ -160,7 +166,7 @@ dotnet run --project src/Atlas.Template.Api
 
 Entity Framework Core migrations are applied automatically during startup, and the database is seeded with the required initial data.
 
-## 4. Explore the API
+## 5. Explore the API
 
 Once the API is running, open Swagger:
 
