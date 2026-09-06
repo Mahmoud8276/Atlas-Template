@@ -104,7 +104,26 @@ cd Atlas-Template
 
 Open `Atlas.Template.sln` in Visual Studio or your preferred editor.
 
-## 2. Configure the application
+## 2. Rename the Template
+
+Rename the Atlas template for your new project using the `Rename-AtlasTemplate.ps1` PowerShell script. The script iterates through the project and renames the essential parts of the template to match your new project name.
+
+Open PowerShell and run the following command from the root directory of the Atlas template:
+
+```powershell
+.\Rename-AtlasTemplate.ps1 -NewName "NewProjectName"
+```
+
+If PowerShell's Execution Policy prevents the script from running, use:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Rename-AtlasTemplate.ps1 -NewName "NewProjectName"
+```
+
+> **Note:** Replace `NewProjectName` with the actual name of your project.
+
+
+## 3. Configure the application
 
 Atlas Template uses the standard ASP.NET Core configuration system. Configure the following values in `appsettings.Development.json` or, preferably, provide sensitive values through **.NET User Secrets** or environment variables.
 
@@ -148,13 +167,13 @@ Atlas Template uses the standard ASP.NET Core configuration system. Configure th
 
 > **Tip:** Do not commit real passwords, connection strings, or JWT keys. Use [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) for local development.
 
-## 3. Create and apply the initial migration
+## 4. Create and apply the initial migration
 
 ```bash
 dotnet ef migrations add InitialCreate --project src\Atlas.Template.Infrastructure --startup-project src\Atlas.Template.Api
 ```
 
-## 4. Run the API
+## 5. Run the API
 
 Restore dependencies and start the API:
 
@@ -166,7 +185,7 @@ dotnet run --project src/Atlas.Template.Api
 
 Entity Framework Core migrations are applied automatically during startup, and the database is seeded with the required initial data.
 
-## 5. Explore the API
+## 6. Explore the API
 
 Once the API is running, open Swagger:
 
