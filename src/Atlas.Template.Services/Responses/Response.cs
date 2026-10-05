@@ -16,6 +16,32 @@ namespace Atlas.Template.Services.Responses
         
         [JsonPropertyOrder(3)]
         public int StatusCode { get; set; }
+
+        public static BaseResponse NotFound(
+            string message = "Not Found!",
+            string details = null)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false,
+                StatusCode = (int)HttpStatusCode.NotFound,
+                Message = message,
+                Details = details
+            };
+        }
+
+        public static BaseResponse Conflict(
+            string message = "Conflict!",
+            string details = null)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false,
+                StatusCode = (int)HttpStatusCode.Conflict,
+                Message = message,
+                Details = details
+            };
+        }
     }
 
     public class Response : BaseResponse
