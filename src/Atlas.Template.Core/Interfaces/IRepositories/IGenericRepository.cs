@@ -10,6 +10,7 @@ namespace Atlas.Template.Core.Interfaces.IRepositories
     {
         public Task<TModel?> GetByIdAsync(TKey id);
         public Task<IReadOnlyList<TModel>> FindAsync(Expression<Func<TModel, bool>> condition);
+        public Task<bool> AnyAsync(Expression<Func<TModel, bool>> condition);
         public Task<IReadOnlyList<TModel>> GetAllAsync();
         public Task AddAsync(TModel model);
         public Task AddRangeAsync(IEnumerable<TModel> models);

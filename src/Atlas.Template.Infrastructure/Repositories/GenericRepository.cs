@@ -72,6 +72,11 @@ namespace Atlas.Template.Infrastructure.Repositories
             return await _context.Set<TModel>().Where(condition).ToListAsync();
         }
 
+        public async Task<bool> AnyAsync(Expression<Func<TModel, bool>> condition)
+        {
+            return await _context.Set<TModel>().AnyAsync(condition);
+        }
+
         public async Task<int> GetCountWithSpecAsync(ISpecification<TModel, TKey> spec)
         {
             return await SpecificationEvaluator<TModel, TKey>.GetQuery(_context.Set<TModel>().AsQueryable(), spec).CountAsync();
