@@ -12,14 +12,16 @@ namespace Atlas.Template.Services.ApplicatoinServicesConfig
             this IServiceCollection services,
             IConfiguration config)
         {
-            var BaseUrl = config["Storage:BaseUrl"];
-
-
-            TypeAdapterConfig<AppUser, UserDetailsDto>
-                .NewConfig()
-                .Map(dest => dest.ImageUrl, src => $"{BaseUrl}/files/UserImages/{src.Image}");
+            Configure(config["Storage:BaseUrl"]);
 
             return services;
+        }
+
+        public static void Configure(string? baseUrl)
+        {
+            TypeAdapterConfig<AppUser, UserDetailsDto>
+                .NewConfig()
+                .Map(dest => dest.ImageUrl, src => $"{baseUrl}/files/UserImages/{src.Image}");
         }
     }
 }
